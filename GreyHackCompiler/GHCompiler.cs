@@ -25,6 +25,7 @@ namespace GreyHackCompiler
         public long LastOptimizeTimeTicks = 0;
         public double BeforeLength = 0;
         public double AfterLength = 0;
+        private string _tmp_out;
         private Stopwatch sw = new Stopwatch();
 
         public CommentSettings Comment = CommentSettings.NONE;
@@ -51,14 +52,14 @@ namespace GreyHackCompiler
         {
             //keywords init
             string tmp =
-                "classID hasIndex for end in abs print range if function not while then else and or true false null return continue break function new self typeof md get_router get_shell nslookup whois is_valid_ip is_lan_ip command_info current_date parent_path home_dir program_path active_user user_mail_address user_bank_number format_columns user_input include_lib exit public_ip local_ip computer_ports computers_lan_ip ping_port port_info used_ports bssid_name essid_name change_password create_user create_group create_folder close_program connect_wifi delete_user delete_group groups network_devices get_ports is_network_active lan_ip show_procs current_path touch wifi_networks File copy move rename chmod set_content set_group group path content is_binary is_folder has_permission owner permissions parent name size delete get_folders get_files get_lan_ip is_closed port_number connect_service scp_upload launch build start_terminal put host_computer aircrack airmon decipher smtp_user_list overflow lib_name version load net_use scan scan_address dump_lib device_ports devices_lan_ip lastIndexOf split replace trim code lower upper val to_int abs acos asin atan tan cos sin char floor round rnd sign sqrt str ceil pi slice join pull reverse sort hasIndex indexOf push remove indexes len pop shuffle sum values time params globals locals";
+                "__isa classID hasIndex for end in abs print range if function not while then else and or true false null return continue break function new self typeof md get_router get_shell nslookup whois is_valid_ip is_lan_ip command_info current_date parent_path home_dir program_path active_user user_mail_address user_bank_number format_columns user_input include_lib exit public_ip local_ip computer_ports computers_lan_ip ping_port port_info used_ports bssid_name essid_name change_password create_user create_group create_folder close_program connect_wifi delete_user delete_group groups network_devices get_ports is_network_active lan_ip show_procs current_path touch wifi_networks File copy move rename chmod set_content set_group group path content is_binary is_folder has_permission owner permissions parent name size delete get_folders get_files get_lan_ip is_closed port_number connect_service scp_upload launch build start_terminal put host_computer aircrack airmon decipher smtp_user_list overflow lib_name version load net_use scan scan_address dump_lib device_ports devices_lan_ip lastIndexOf split replace trim code lower upper val to_int abs acos asin atan tan cos sin char floor round rnd sign sqrt str ceil pi slice join pull reverse sort hasIndex indexOf push remove indexes len pop shuffle sum values time params globals locals";
             foreach (string s in tmp.Split(' '))
             {
                 _keywords.Add(s);
             }
 
             //operators init
-            tmp = "< > ! = + * - / :";
+            tmp = "< > ! = + * - / .";
             foreach (string s in tmp.Split(' '))
             {
                 _operators.Add(s[0]);
@@ -135,6 +136,14 @@ namespace GreyHackCompiler
             _map_active.Push(false);
         }
 
+        private void RemoveWhiteSpaces()
+        {
+            while (_queue.Count>0&&char.IsWhiteSpace(_queue.Peek()))
+            {
+                _queue.Dequeue();
+            }
+        }
+
         public string Optimize(string input)
         {
             //compiler reset
@@ -145,11 +154,11 @@ namespace GreyHackCompiler
             //input string to queue
             BeforeLength = input.Length;
             _queue = new Queue<char>(input);
-            
 
             while (_queue.Count > 0)
             {
                 //updates next value
+                //I know its ineffective but it sooo much easier
                 _tmp_value.Clear();
                 _tmp_value.Add(_queue.Dequeue());
                 if (_no_space.Contains(_tmp_value[0]))
@@ -159,10 +168,8 @@ namespace GreyHackCompiler
                         _out_list.RemoveAt(_out_list.Count-1);
                     }
 
-                    while (_queue.Count > 0 && _queue.Peek()==' ')
-                    {
-                        _queue.Dequeue();
-                    }
+
+                    RemoveWhiteSpaces();
                 }
 
                 if (char.IsLetter(_tmp_value[0])||_tmp_value[0] =='_')
@@ -188,10 +195,7 @@ namespace GreyHackCompiler
                     switch (_tmp_value[0])
                     {
                         case '\n':
-                            while (char.IsWhiteSpace(_queue.Peek()))
-                            {
-                                _queue.Dequeue();
-                            }
+                            RemoveWhiteSpaces();
                             _tmp_value_string = "\n";
                             break;
                         case ' ':
@@ -202,12 +206,12 @@ namespace GreyHackCompiler
                             _tmp_value_string = " ";
                             break;
                         case '(':
-                            _value_active.Push(false);
-                            _tmp_value_string = new string(_tmp_value.ToArray());
+                            _value_active.Push(_value_active.Peek());
+                            _tmp_value_string = "(";
                             break;
                         case ')':
                             _value_active.Pop();
-                            _tmp_value_string = new string(_tmp_value.ToArray());
+                            _tmp_value_string = ")";
                             break;
                         case '"':
                             while (_queue.Count > 0 && _queue.Peek()!='"')
@@ -222,27 +226,30 @@ namespace GreyHackCompiler
 
                             if (_value_active.Peek())
                             {
-                                if (_tmp_value.Last()=='"')
+                                RemoveWhiteSpaces();
+                                if (!_operators.Contains(_queue.Peek()))
                                 {
-                                    _tmp_value.RemoveAt(_tmp_value.Count-1);
-                                }
-                                if (_tmp_value.Count > 0 && _tmp_value[0] == '"')
-                                {
-                                    _tmp_value.RemoveAt(0);
-                                }
+                                    if (_tmp_value.Last() == '"')
+                                    {
+                                        _tmp_value.RemoveAt(_tmp_value.Count - 1);
+                                    }
+                                    if (_tmp_value.Count > 0 && _tmp_value[0] == '"')
+                                    {
+                                        _tmp_value.RemoveAt(0);
+                                    }
 
-                                _tmp_value_string = new string(_tmp_value.ToArray());
-                                if (!_pairs.ContainsKey(_tmp_value_string))
-                                {
-                                    _pairs.Add(_tmp_value_string,Next());
-                                }
+                                    _tmp_value_string = new string(_tmp_value.ToArray());
+                                    if (!_pairs.ContainsKey(_tmp_value_string))
+                                    {
+                                        _pairs.Add(_tmp_value_string, Next());
+                                    }
 
-                                _tmp_value_string = "\"" + _pairs[_tmp_value_string] + "\"";
+                                    _tmp_value_string = "\"" + _pairs[_tmp_value_string] + "\"";
+                                    break;
+                                }
                             }
-                            else
-                            {
-                                _tmp_value_string = new string(_tmp_value.ToArray());
-                            }
+                            _tmp_value_string = new string(_tmp_value.ToArray());
+                            
                             break;
                         case '{':
                             while (_queue.Peek() == ' ')
@@ -256,14 +263,15 @@ namespace GreyHackCompiler
                                 _value_active.Push(true);
                             }
 
-                            _tmp_value_string = _tmp_value[0].ToString();
+                            _tmp_value_string = "{";
                             break;
                         case '}':
                             if (_out_list.Last()!="{")
                             {
                                 _map_active.Pop();
                             }
-                            _tmp_value_string = _tmp_value[0].ToString();
+
+                            _tmp_value_string = "}";
                             break;
                         case '[':
                             while (_queue.Peek() == ' ')
@@ -284,7 +292,7 @@ namespace GreyHackCompiler
                                 _map_active.Push(false);
                             }
 
-                            _tmp_value_string = _tmp_value[0].ToString();
+                            _tmp_value_string = "[";
                             break;
                         case ']':
                             if (_out_list.Last()!="[")
@@ -293,7 +301,7 @@ namespace GreyHackCompiler
                                 _map_active.Pop();
                             }
 
-                            _tmp_value_string = _tmp_value[0].ToString();
+                            _tmp_value_string = "]";
                             break;
                         case ',':
                             if (_map_active.Peek())
@@ -301,7 +309,7 @@ namespace GreyHackCompiler
                                 _value_active.Push(true);
                             }
 
-                            _tmp_value_string = _tmp_value[0].ToString();
+                            _tmp_value_string = ",";
                             break;
                         case ':':
                             if (_map_active.Peek())
@@ -309,10 +317,10 @@ namespace GreyHackCompiler
                                 _value_active.Pop();
                             }
 
-                            _tmp_value_string = _tmp_value[0].ToString();
+                            _tmp_value_string = ":";
                             break;
                         default:
-                            _tmp_value_string = new string(_tmp_value.ToArray());
+                            _tmp_value_string = _tmp_value[0].ToString();
                             break;
                     }
                 }
@@ -320,11 +328,11 @@ namespace GreyHackCompiler
                 _out_list.Add(_tmp_value_string);
             }
 
-            string tmp = string.Join("", _out_list);
+            _tmp_out = string.Join("", _out_list);
             sw.Stop();
             LastOptimizeTimeTicks = sw.ElapsedTicks;
-            AfterLength = tmp.Length;
-            return tmp;
+            AfterLength = _tmp_out.Length;
+            return _tmp_out;
             
         }
     }
