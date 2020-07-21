@@ -136,12 +136,23 @@ namespace GreyHackCompiler
             _map_active.Push(false);
         }
 
-        private void RemoveWhiteSpaces()
+        private void RemoveWhiteSpaces(bool lines = false)
         {
-            while (_queue.Count>0&&char.IsWhiteSpace(_queue.Peek()))
+            if (lines)
             {
-                _queue.Dequeue();
+                while (_queue.Count > 0 && char.IsWhiteSpace(_queue.Peek()))
+                {
+                    _queue.Dequeue();
+                }
             }
+            else
+            {
+                while (_queue.Count > 0 && _queue.Peek() == ' ')
+                {
+                    _queue.Dequeue();
+                }
+            }
+            
         }
 
         public string Optimize(string input)
@@ -195,7 +206,7 @@ namespace GreyHackCompiler
                     switch (_tmp_value[0])
                     {
                         case '\n':
-                            RemoveWhiteSpaces();
+                            RemoveWhiteSpaces(true);
                             _tmp_value_string = "\n";
                             break;
                         case ' ':
@@ -227,7 +238,7 @@ namespace GreyHackCompiler
                             if (_value_active.Peek())
                             {
                                 RemoveWhiteSpaces();
-                                if (!_operators.Contains(_queue.Peek()))
+                                if (!_operators.Contains(_queue.Peek())&&!_operators.Contains(_out_list.Last()[0]))
                                 {
                                     if (_tmp_value.Last() == '"')
                                     {
