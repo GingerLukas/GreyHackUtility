@@ -30,11 +30,13 @@
         {
             this.outputRichTextBox = new System.Windows.Forms.RichTextBox();
             this.inputRichTextBox = new System.Windows.Forms.RichTextBox();
-            this.mainButton = new System.Windows.Forms.Button();
+            this.optimizeButton = new System.Windows.Forms.Button();
             this.timeLabel = new System.Windows.Forms.Label();
             this.beforeLabel = new System.Windows.Forms.Label();
             this.afterLabel = new System.Windows.Forms.Label();
             this.rationLabel = new System.Windows.Forms.Label();
+            this.swapButton = new System.Windows.Forms.Button();
+            this.includeButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // outputRichTextBox
@@ -57,15 +59,15 @@
             this.inputRichTextBox.TabIndex = 0;
             this.inputRichTextBox.Text = "";
             // 
-            // mainButton
+            // optimizeButton
             // 
-            this.mainButton.Location = new System.Drawing.Point(518, 328);
-            this.mainButton.Name = "mainButton";
-            this.mainButton.Size = new System.Drawing.Size(145, 64);
-            this.mainButton.TabIndex = 2;
-            this.mainButton.Text = "Optimize";
-            this.mainButton.UseVisualStyleBackColor = true;
-            this.mainButton.Click += new System.EventHandler(this.button1_Click);
+            this.optimizeButton.Location = new System.Drawing.Point(518, 328);
+            this.optimizeButton.Name = "optimizeButton";
+            this.optimizeButton.Size = new System.Drawing.Size(145, 64);
+            this.optimizeButton.TabIndex = 2;
+            this.optimizeButton.Text = "Optimize";
+            this.optimizeButton.UseVisualStyleBackColor = true;
+            this.optimizeButton.Click += new System.EventHandler(this.button1_Click);
             // 
             // timeLabel
             // 
@@ -107,16 +109,37 @@
             this.rationLabel.Text = "%";
             this.rationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // swapButton
+            // 
+            this.swapButton.Location = new System.Drawing.Point(518, 12);
+            this.swapButton.Name = "swapButton";
+            this.swapButton.Size = new System.Drawing.Size(145, 64);
+            this.swapButton.TabIndex = 7;
+            this.swapButton.Text = "<<";
+            this.swapButton.UseVisualStyleBackColor = true;
+            this.swapButton.Click += new System.EventHandler(this.swapButton_Click);
+            // 
+            // includeButton
+            // 
+            this.includeButton.Location = new System.Drawing.Point(519, 179);
+            this.includeButton.Name = "includeButton";
+            this.includeButton.Size = new System.Drawing.Size(145, 64);
+            this.includeButton.TabIndex = 8;
+            this.includeButton.Text = "Include";
+            this.includeButton.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1182, 423);
+            this.Controls.Add(this.includeButton);
+            this.Controls.Add(this.swapButton);
             this.Controls.Add(this.rationLabel);
             this.Controls.Add(this.afterLabel);
             this.Controls.Add(this.beforeLabel);
             this.Controls.Add(this.timeLabel);
-            this.Controls.Add(this.mainButton);
+            this.Controls.Add(this.optimizeButton);
             this.Controls.Add(this.inputRichTextBox);
             this.Controls.Add(this.outputRichTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -132,12 +155,14 @@
         #endregion
 
         private System.Windows.Forms.RichTextBox outputRichTextBox;
-        private System.Windows.Forms.Button mainButton;
+        private System.Windows.Forms.Button optimizeButton;
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.Label beforeLabel;
         private System.Windows.Forms.Label afterLabel;
         private System.Windows.Forms.Label rationLabel;
         private System.Windows.Forms.RichTextBox inputRichTextBox;
+        private System.Windows.Forms.Button swapButton;
+        private System.Windows.Forms.Button includeButton;
     }
 }
 

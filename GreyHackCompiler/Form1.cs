@@ -76,5 +76,10 @@ namespace GreyHackCompiler
             }
             Center();
         }
+
+        private void swapButton_Click(object sender, EventArgs e)
+        {
+            inputRichTextBox.Text = outputRichTextBox.Text;
+        }
     }
 }

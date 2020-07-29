@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace GreyHackCompiler
 {
@@ -153,6 +154,26 @@ namespace GreyHackCompiler
                 }
             }
             
+        }
+
+        public string Include(string input, string start = "#!",string end="!")
+        {
+            StringBuilder sb = new StringBuilder();
+            int start_index = 0;
+            while ((start_index = input.IndexOf(start,start_index))!=-1)
+            {
+                while (++start_index<input.Length&&char.IsLetterOrDigit(input[start_index]))
+                {
+                    sb.Append(input[start_index]);
+                }
+
+                if (start_index+end.Length<input.Length&&input.Substring(start_index,end.Length)==end)
+                {
+
+                }
+            }
+
+            return sb.ToString();
         }
 
         public string Optimize(string input)
@@ -340,6 +361,7 @@ namespace GreyHackCompiler
             }
 
             _tmp_out = string.Join("", _out_list);
+            //_tmp_out = _tmp_out.Replace('\n', ';');
             sw.Stop();
             LastOptimizeTimeTicks = sw.ElapsedTicks;
             AfterLength = _tmp_out.Length;
