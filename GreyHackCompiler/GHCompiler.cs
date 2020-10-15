@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Windows.Forms;
 
 namespace GreyHackCompiler
 {
@@ -45,7 +46,15 @@ namespace GreyHackCompiler
 
         private string _tmp_value_string;
         private string _tmp_out;
-        private string _path_to_classes = @"C:\Users\lukas\OneDrive - Střední škola a vyšší odborná škola aplikované kybernetiky s.r.o\Plocha\GreyHack\Classes\";
+        public string PathToLocalClasses
+        {
+            get => _path_to_classes;
+            set => _path_to_classes = value;
+        }
+        private string _path_to_classes = String.Empty;
+
+        private List<string> _errors_include;
+        private List<string> _errors_compile;
 
         public long LastTimeTicks = 0;
 
@@ -58,6 +67,7 @@ namespace GreyHackCompiler
 
         public GHCompiler()
         {
+            
             _pairs = new Dictionary<string, string>();
             _keywords = new HashSet<string>();
             _operators = new HashSet<char>();
@@ -68,6 +78,8 @@ namespace GreyHackCompiler
             _index = new List<int>();
             _abc = new List<char>();
             _next_out = new List<char>();
+            _errors_include = new List<string>();
+            _errors_compile = new List<string>();
             _map_active = new Stack<bool>();
             _value_active = new Stack<bool>();
             _index.Add(-1);
@@ -146,8 +158,20 @@ namespace GreyHackCompiler
             return tmp;
         }
 
-        private void Reset()
+        private void ResetInclude()
         {
+            //errors reset
+            _errors_include.Clear();
+
+            //included classes reset
+            _included.Clear();
+        }
+
+        private void ResetCompiler()
+        {
+            //errors reset
+            _errors_compile.Clear();
+
             //pairs generator reset
             _index.Clear();
             _index.Add(-1);
@@ -199,29 +223,65 @@ namespace GreyHackCompiler
             return true;
         }
 
-
-        //TODO rework (too dumb) local cache; option to include local class
-        public string GetClassFromGitHub(string name)
+        public string GetClassFromGitHub(string author, string name)
         {
-            string url = $"https://raw.githack.com/GingerLukas/GreyHackClasses/main/{name}.src";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.AutomaticDecompression = DecompressionMethods.GZip;
-
-            using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+            try
             {
-                if (response.StatusCode!=HttpStatusCode.OK)
+                string url = $"https://raw.githack.com/{author}/GreyHackClasses/main/{name}.src";
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.AutomaticDecompression = DecompressionMethods.GZip;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
-                    return "";
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        return "";
+                    }
+                    using (Stream stream = response.GetResponseStream())
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+
                 }
-                using (Stream stream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-                
+            }
+            catch (Exception e)
+            {
+                _errors_include.Add($"ERROR::GITHUB_CLASS_NOT_FOUND({name} by {author})");
+                return "";
+            }
+            
+
+        }
+
+        public string GetClassFromFile(string name)
+        {
+            string path = Path.Combine(_path_to_classes, name)+".src";
+            if (!File.Exists(path))
+            {
+                _errors_include.Add($"ERROR::LOCAL_CLASS_NOT_FOUND({name})");
+                return "";
             }
 
+            return File.ReadAllText(path);
+        }
+
+        public string GetClass(string name)
+        {
+            var tmp = name.Split('/');
+            if (tmp.Length>2)
+            {
+                _errors_include.Add($"ERROR::INVALID_CLASS_NAME({name})");
+                return "";
+            }
+
+            if (tmp.Length==2)
+            {
+                return GetClassFromGitHub(tmp[0], tmp[1]);
+            }
+
+            return GetClassFromFile(tmp[0]);
         }
 
         public string Include(string input, string start = "#!", string end = "!", bool first = true, bool start_sw = true)
@@ -231,7 +291,7 @@ namespace GreyHackCompiler
                 if (start_sw)
                     sw.Restart();
 
-                _included.Clear();
+                ResetInclude();
                 BeforeLength = input.Length;
             }
             StringBuilder sb = new StringBuilder();
@@ -257,7 +317,7 @@ namespace GreyHackCompiler
                     {
                         _included.Add(class_tmp);
                         
-                        sb.Append(Include(GetClassFromGitHub(class_tmp), start, end, false, start_sw));
+                        sb.Append(Include(GetClass(class_tmp), start, end, false, start_sw));
                     }
                 }
                 else
@@ -277,6 +337,18 @@ namespace GreyHackCompiler
 
                 AfterLength = sb.Length;
             }
+
+            if (first && _errors_include.Count!=0)
+            {
+                StringBuilder error_sb = new StringBuilder();
+                foreach (string s in _errors_include)
+                {
+                    error_sb.AppendLine(s);
+                }
+
+                MessageBox.Show(error_sb.ToString(),
+                    $"{_errors_include.Count} " + (_errors_include.Count == 1 ? "Error" : "Errors"));
+            }
             return sb.ToString();
         }
 
@@ -284,7 +356,7 @@ namespace GreyHackCompiler
         {
 
             //compiler reset
-            Reset();
+            ResetCompiler();
             sw.Restart();
             input = Include(input, start, end, true, false);
             //input string to queue

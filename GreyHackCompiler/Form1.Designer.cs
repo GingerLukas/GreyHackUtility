@@ -43,27 +43,32 @@
             // 
             this.outputRichTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.outputRichTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.outputRichTextBox.Location = new System.Drawing.Point(670, 12);
+            this.outputRichTextBox.Location = new System.Drawing.Point(502, 10);
+            this.outputRichTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.outputRichTextBox.Name = "outputRichTextBox";
             this.outputRichTextBox.ReadOnly = true;
-            this.outputRichTextBox.Size = new System.Drawing.Size(500, 380);
+            this.outputRichTextBox.Size = new System.Drawing.Size(375, 309);
             this.outputRichTextBox.TabIndex = 0;
             this.outputRichTextBox.Text = "";
+            this.outputRichTextBox.WordWrap = false;
             // 
             // inputRichTextBox
             // 
             this.inputRichTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.inputRichTextBox.Location = new System.Drawing.Point(12, 12);
+            this.inputRichTextBox.Location = new System.Drawing.Point(9, 10);
+            this.inputRichTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.inputRichTextBox.Name = "inputRichTextBox";
-            this.inputRichTextBox.Size = new System.Drawing.Size(500, 380);
+            this.inputRichTextBox.Size = new System.Drawing.Size(375, 309);
             this.inputRichTextBox.TabIndex = 0;
             this.inputRichTextBox.Text = "";
+            this.inputRichTextBox.WordWrap = false;
             // 
             // optimizeButton
             // 
-            this.optimizeButton.Location = new System.Drawing.Point(518, 328);
+            this.optimizeButton.Location = new System.Drawing.Point(388, 266);
+            this.optimizeButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.optimizeButton.Name = "optimizeButton";
-            this.optimizeButton.Size = new System.Drawing.Size(145, 64);
+            this.optimizeButton.Size = new System.Drawing.Size(109, 52);
             this.optimizeButton.TabIndex = 2;
             this.optimizeButton.Text = "Optimize";
             this.optimizeButton.UseVisualStyleBackColor = true;
@@ -72,9 +77,10 @@
             // timeLabel
             // 
             this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(527, 395);
+            this.timeLabel.Location = new System.Drawing.Point(395, 321);
+            this.timeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(125, 17);
+            this.timeLabel.Size = new System.Drawing.Size(93, 13);
             this.timeLabel.TabIndex = 3;
             this.timeLabel.Text = "Last optimize time:";
             this.timeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -82,9 +88,10 @@
             // beforeLabel
             // 
             this.beforeLabel.AutoSize = true;
-            this.beforeLabel.Location = new System.Drawing.Point(159, 395);
+            this.beforeLabel.Location = new System.Drawing.Point(119, 321);
+            this.beforeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.beforeLabel.Name = "beforeLabel";
-            this.beforeLabel.Size = new System.Drawing.Size(49, 17);
+            this.beforeLabel.Size = new System.Drawing.Size(37, 13);
             this.beforeLabel.TabIndex = 4;
             this.beforeLabel.Text = "before";
             this.beforeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -92,9 +99,10 @@
             // afterLabel
             // 
             this.afterLabel.AutoSize = true;
-            this.afterLabel.Location = new System.Drawing.Point(1115, 395);
+            this.afterLabel.Location = new System.Drawing.Point(836, 321);
+            this.afterLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.afterLabel.Name = "afterLabel";
-            this.afterLabel.Size = new System.Drawing.Size(37, 17);
+            this.afterLabel.Size = new System.Drawing.Size(28, 13);
             this.afterLabel.TabIndex = 5;
             this.afterLabel.Text = "after";
             this.afterLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -102,18 +110,20 @@
             // rationLabel
             // 
             this.rationLabel.AutoSize = true;
-            this.rationLabel.Location = new System.Drawing.Point(587, 308);
+            this.rationLabel.Location = new System.Drawing.Point(440, 250);
+            this.rationLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.rationLabel.Name = "rationLabel";
-            this.rationLabel.Size = new System.Drawing.Size(20, 17);
+            this.rationLabel.Size = new System.Drawing.Size(15, 13);
             this.rationLabel.TabIndex = 6;
             this.rationLabel.Text = "%";
             this.rationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // swapButton
             // 
-            this.swapButton.Location = new System.Drawing.Point(518, 12);
+            this.swapButton.Location = new System.Drawing.Point(388, 10);
+            this.swapButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.swapButton.Name = "swapButton";
-            this.swapButton.Size = new System.Drawing.Size(145, 64);
+            this.swapButton.Size = new System.Drawing.Size(109, 52);
             this.swapButton.TabIndex = 7;
             this.swapButton.Text = "<<";
             this.swapButton.UseVisualStyleBackColor = true;
@@ -121,9 +131,10 @@
             // 
             // includeButton
             // 
-            this.includeButton.Location = new System.Drawing.Point(519, 179);
+            this.includeButton.Location = new System.Drawing.Point(389, 145);
+            this.includeButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.includeButton.Name = "includeButton";
-            this.includeButton.Size = new System.Drawing.Size(145, 64);
+            this.includeButton.Size = new System.Drawing.Size(109, 52);
             this.includeButton.TabIndex = 8;
             this.includeButton.Text = "Include";
             this.includeButton.UseVisualStyleBackColor = true;
@@ -131,9 +142,10 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AllowDrop = true;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1182, 423);
+            this.ClientSize = new System.Drawing.Size(886, 344);
             this.Controls.Add(this.includeButton);
             this.Controls.Add(this.swapButton);
             this.Controls.Add(this.rationLabel);
@@ -144,10 +156,13 @@
             this.Controls.Add(this.inputRichTextBox);
             this.Controls.Add(this.outputRichTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "GreyHack Optimizer by Ginger";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.ResumeLayout(false);
             this.PerformLayout();
 
