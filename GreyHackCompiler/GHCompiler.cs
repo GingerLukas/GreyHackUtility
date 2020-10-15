@@ -1,32 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace GreyHackCompiler
 {
     class GHCompiler
     {
+        public static GHCompiler Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new GHCompiler();
+                }
+
+                return _instance;
+            }
+        }
+
+        private static GHCompiler _instance;
+
         private Dictionary<string, string> _pairs;
+
         private HashSet<string> _keywords;
         private HashSet<char> _operators;
         private HashSet<char> _no_space;
+        private HashSet<string> _included;
+
         private List<string> _out_list;
-        private Stack<bool> _map_active;
-        private Stack<bool> _value_active;
         private List<char> _tmp_value;
-        private string _tmp_value_string;
-        private Queue<char> _queue;
         private List<int> _index;
         private List<char> _abc;
         private List<char> _next_out;
-        public long LastOptimizeTimeTicks = 0;
+
+        private Stack<bool> _map_active;
+        private Stack<bool> _value_active;
+
+        private Queue<char> _queue;
+
+        private string _tmp_value_string;
+        private string _tmp_out;
+        private string _path_to_classes = @"C:\Users\lukas\OneDrive - Střední škola a vyšší odborná škola aplikované kybernetiky s.r.o\Plocha\GreyHack\Classes\";
+
+        public long LastTimeTicks = 0;
+
         public double BeforeLength = 0;
         public double AfterLength = 0;
-        private string _tmp_out;
+
         private Stopwatch sw = new Stopwatch();
 
         public CommentSettings Comment = CommentSettings.NONE;
@@ -37,14 +61,15 @@ namespace GreyHackCompiler
             _keywords = new HashSet<string>();
             _operators = new HashSet<char>();
             _no_space = new HashSet<char>();
+            _included = new HashSet<string>();
             _out_list = new List<string>();
-            _map_active = new Stack<bool>();
-            _value_active = new Stack<bool>();
             _tmp_value = new List<char>();
             _index = new List<int>();
-            _index.Add(-1);
             _abc = new List<char>();
             _next_out = new List<char>();
+            _map_active = new Stack<bool>();
+            _value_active = new Stack<bool>();
+            _index.Add(-1);
 
             Setup();
         }
@@ -92,10 +117,10 @@ namespace GreyHackCompiler
             for (int i = 0; i < _index.Count; i++)
             {
                 _index[i]++;
-                if (_index[i]>=_abc.Count)
+                if (_index[i] >= _abc.Count)
                 {
                     _index[i] = 0;
-                    if (i+1==_index.Count)
+                    if (i + 1 == _index.Count)
                     {
                         _index.Add(-1);
                     }
@@ -129,7 +154,7 @@ namespace GreyHackCompiler
 
             //output reset
             _out_list.Clear();
-            
+
             //stacks reset
             _value_active.Clear();
             _value_active.Push(false);
@@ -153,36 +178,86 @@ namespace GreyHackCompiler
                     _queue.Dequeue();
                 }
             }
-            
+
         }
 
-        public string Include(string input, string start = "#!",string end="!")
+        private bool CompareStrings(ref string one, int start, string two)
         {
-            StringBuilder sb = new StringBuilder();
-            int start_index = 0;
-            while ((start_index = input.IndexOf(start,start_index))!=-1)
+            if (one.Length - start < two.Length)
             {
-                while (++start_index<input.Length&&char.IsLetterOrDigit(input[start_index]))
+                return false;
+            }
+            for (int i = 0; i < two.Length; i++, start++)
+            {
+                if (one[start] != two[i])
                 {
-                    sb.Append(input[start_index]);
-                }
-
-                if (start_index+end.Length<input.Length&&input.Substring(start_index,end.Length)==end)
-                {
-
+                    return false;
                 }
             }
 
+            return true;
+        }
+
+        public string Include(string input, string start = "#!", string end = "!", bool first = true, bool start_sw = true)
+        {
+            if (first)
+            {
+                if (start_sw)
+                    sw.Restart();
+
+                _included.Clear();
+                BeforeLength = input.Length;
+            }
+            StringBuilder sb = new StringBuilder();
+            StringBuilder class_sb = new StringBuilder();
+            int index = 0;
+            while (index < input.Length)
+            {
+                if (CompareStrings(ref input, index, start))
+                {
+                    class_sb.Clear();
+                    index += start.Length;
+                    while (!CompareStrings(ref input, index, end))
+                    {
+                        class_sb.Append(input[index]);
+                        index++;
+                    }
+
+                    index += end.Length;
+                    string class_tmp = class_sb.ToString();
+                    if (!_included.Contains(class_tmp) && File.Exists(_path_to_classes + class_tmp + ".src"))
+                    {
+                        _included.Add(class_tmp);
+                        sb.Append(Include(File.ReadAllText(_path_to_classes + class_tmp + ".src"), start, end, false, start_sw));
+                    }
+                }
+                else
+                {
+                    sb.Append(input[index]);
+                    index++;
+                }
+            }
+
+            if (first)
+            {
+                if (start_sw)
+                {
+                    sw.Stop();
+                    LastTimeTicks = sw.ElapsedTicks;
+                }
+
+                AfterLength = sb.Length;
+            }
             return sb.ToString();
         }
 
-        public string Optimize(string input)
+        public string Optimize(string input, string start = "#!", string end = "!")
         {
+
             //compiler reset
             Reset();
-            sw.Reset();
-            sw.Start();
-
+            sw.Restart();
+            input = Include(input, start, end, true, false);
             //input string to queue
             BeforeLength = input.Length;
             _queue = new Queue<char>(input);
@@ -195,18 +270,18 @@ namespace GreyHackCompiler
                 _tmp_value.Add(_queue.Dequeue());
                 if (_no_space.Contains(_tmp_value[0]))
                 {
-                    while (_out_list.Last()[0]==' ')
+                    while (_out_list.Last()[0] == ' ')
                     {
-                        _out_list.RemoveAt(_out_list.Count-1);
+                        _out_list.RemoveAt(_out_list.Count - 1);
                     }
 
 
                     RemoveWhiteSpaces();
                 }
 
-                if (char.IsLetter(_tmp_value[0])||_tmp_value[0] =='_')
+                if (char.IsLetter(_tmp_value[0]) || _tmp_value[0] == '_')
                 {
-                    while (_queue.Count>0 && (char.IsLetter(_queue.Peek())||_queue.Peek()=='_'))
+                    while (_queue.Count > 0 && (char.IsLetter(_queue.Peek()) || _queue.Peek() == '_'))
                     {
                         _tmp_value.Add(_queue.Dequeue());
                     }
@@ -216,7 +291,7 @@ namespace GreyHackCompiler
                     {
                         if (!_pairs.ContainsKey(_tmp_value_string))
                         {
-                            _pairs.Add(_tmp_value_string,Next());
+                            _pairs.Add(_tmp_value_string, Next());
                         }
 
                         _tmp_value_string = _pairs[_tmp_value_string];
@@ -246,12 +321,12 @@ namespace GreyHackCompiler
                             _tmp_value_string = ")";
                             break;
                         case '"':
-                            while (_queue.Count > 0 && _queue.Peek()!='"')
+                            while (_queue.Count > 0 && _queue.Peek() != '"')
                             {
                                 _tmp_value.Add(_queue.Dequeue());
                             }
 
-                            if (_queue.Count>0)
+                            if (_queue.Count > 0)
                             {
                                 _tmp_value.Add(_queue.Dequeue());
                             }
@@ -259,7 +334,7 @@ namespace GreyHackCompiler
                             if (_value_active.Peek())
                             {
                                 RemoveWhiteSpaces();
-                                if (!_operators.Contains(_queue.Peek())&&!_operators.Contains(_out_list.Last()[0]))
+                                if (!_operators.Contains(_queue.Peek()) && !_operators.Contains(_out_list.Last()[0]))
                                 {
                                     if (_tmp_value.Last() == '"')
                                     {
@@ -281,7 +356,7 @@ namespace GreyHackCompiler
                                 }
                             }
                             _tmp_value_string = new string(_tmp_value.ToArray());
-                            
+
                             break;
                         case '{':
                             while (_queue.Peek() == ' ')
@@ -289,7 +364,7 @@ namespace GreyHackCompiler
                                 _queue.Dequeue();
                             }
 
-                            if (_queue.Peek()!='}')
+                            if (_queue.Peek() != '}')
                             {
                                 _map_active.Push(true);
                                 _value_active.Push(true);
@@ -298,7 +373,7 @@ namespace GreyHackCompiler
                             _tmp_value_string = "{";
                             break;
                         case '}':
-                            if (_out_list.Last()!="{")
+                            if (_out_list.Last() != "{")
                             {
                                 _map_active.Pop();
                             }
@@ -311,7 +386,7 @@ namespace GreyHackCompiler
                                 _queue.Dequeue();
                             }
 
-                            if (_queue.Peek()!=']')
+                            if (_queue.Peek() != ']')
                             {
                                 if (_operators.Contains(_out_list.Last()[0]))
                                 {
@@ -327,7 +402,7 @@ namespace GreyHackCompiler
                             _tmp_value_string = "[";
                             break;
                         case ']':
-                            if (_out_list.Last()!="[")
+                            if (_out_list.Last() != "[")
                             {
                                 _value_active.Pop();
                                 _map_active.Pop();
@@ -363,10 +438,10 @@ namespace GreyHackCompiler
             _tmp_out = string.Join("", _out_list);
             //_tmp_out = _tmp_out.Replace('\n', ';');
             sw.Stop();
-            LastOptimizeTimeTicks = sw.ElapsedTicks;
+            LastTimeTicks = sw.ElapsedTicks;
             AfterLength = _tmp_out.Length;
             return _tmp_out;
-            
+
         }
     }
 

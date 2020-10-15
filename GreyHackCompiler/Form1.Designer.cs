@@ -127,6 +127,7 @@
             this.includeButton.TabIndex = 8;
             this.includeButton.Text = "Include";
             this.includeButton.UseVisualStyleBackColor = true;
+            this.includeButton.Click += new System.EventHandler(this.includeButton_Click);
             // 
             // Form1
             // 

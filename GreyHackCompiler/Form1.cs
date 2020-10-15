@@ -47,39 +47,60 @@ namespace GreyHackCompiler
             if (!string.IsNullOrWhiteSpace(inputRichTextBox.Text))
             {
                 outputRichTextBox.Text = compiler.Optimize(inputRichTextBox.Text);
-                TimeSpan t = TimeSpan.FromTicks(compiler.LastOptimizeTimeTicks);
-                string tmp = "null";
-                if (t.Days!=0)
-                {
-                    tmp = t.TotalDays + " days";
-                }
-                else if(t.Hours!=0)
-                {
-                    tmp = t.TotalHours + " hours";
-                }
-                else if (t.Minutes!=0)
-                {
-                    tmp = t.TotalMinutes + " minutes";
-                }
-                else if (t.Seconds!=0)
-                {
-                    tmp = t.TotalSeconds + " seconds";
-                }
-                else
-                {
-                    tmp = t.TotalMilliseconds + " milliseconds";
-                }
-                timeLabel.Text = time_label_preset + " " + tmp;
-                beforeLabel.Text = "Before length: " + compiler.BeforeLength;
-                afterLabel.Text = "After length: " + compiler.AfterLength;
-                rationLabel.Text = (100d-Math.Round(((compiler.AfterLength / compiler.BeforeLength) * 100), 4)).ToString()+"%";
+                UpdateLabels();
             }
-            Center();
+            else
+            {
+                Center();
+            }
         }
 
+        private void UpdateLabels()
+        {
+            TimeSpan t = TimeSpan.FromTicks(compiler.LastTimeTicks);
+            string tmp = "null";
+            if (t.Days != 0)
+            {
+                tmp = t.TotalDays + " days";
+            }
+            else if (t.Hours != 0)
+            {
+                tmp = t.TotalHours + " hours";
+            }
+            else if (t.Minutes != 0)
+            {
+                tmp = t.TotalMinutes + " minutes";
+            }
+            else if (t.Seconds != 0)
+            {
+                tmp = t.TotalSeconds + " seconds";
+            }
+            else
+            {
+                tmp = t.TotalMilliseconds + " milliseconds";
+            }
+            timeLabel.Text = time_label_preset + " " + tmp;
+            beforeLabel.Text = "Before length: " + compiler.BeforeLength;
+            afterLabel.Text = "After length: " + compiler.AfterLength;
+            rationLabel.Text = (100d - Math.Round(((compiler.AfterLength / compiler.BeforeLength) * 100), 4)).ToString() + "%";
+            Center();
+        }
         private void swapButton_Click(object sender, EventArgs e)
         {
             inputRichTextBox.Text = outputRichTextBox.Text;
+        }
+
+        private void includeButton_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(inputRichTextBox.Text))
+            {
+                outputRichTextBox.Text = compiler.Include(inputRichTextBox.Text);
+                UpdateLabels();
+            }
+            else
+            {
+                Center();
+            }
         }
     }
 }
