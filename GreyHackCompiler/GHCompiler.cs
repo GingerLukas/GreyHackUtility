@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace GreyHackCompiler
@@ -198,6 +199,31 @@ namespace GreyHackCompiler
             return true;
         }
 
+
+        //TODO rework (too dumb) local cache; option to include local class
+        public string GetClassFromGitHub(string name)
+        {
+            string url = $"https://raw.githack.com/GingerLukas/GreyHackClasses/main/{name}.src";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+            {
+                if (response.StatusCode!=HttpStatusCode.OK)
+                {
+                    return "";
+                }
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+                
+            }
+
+        }
+
         public string Include(string input, string start = "#!", string end = "!", bool first = true, bool start_sw = true)
         {
             if (first)
@@ -225,10 +251,13 @@ namespace GreyHackCompiler
 
                     index += end.Length;
                     string class_tmp = class_sb.ToString();
-                    if (!_included.Contains(class_tmp) && File.Exists(_path_to_classes + class_tmp + ".src"))
+                    
+
+                    if (!_included.Contains(class_tmp))
                     {
                         _included.Add(class_tmp);
-                        sb.Append(Include(File.ReadAllText(_path_to_classes + class_tmp + ".src"), start, end, false, start_sw));
+                        
+                        sb.Append(Include(GetClassFromGitHub(class_tmp), start, end, false, start_sw));
                     }
                 }
                 else
