@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace GreyHackCompiler
 {
@@ -25,6 +26,7 @@ namespace GreyHackCompiler
         }
 
         private static GHCompiler _instance;
+
 
         private Dictionary<string, string> _pairs;
 
@@ -52,6 +54,8 @@ namespace GreyHackCompiler
             set => _path_to_classes = value;
         }
         private string _path_to_classes = String.Empty;
+
+        private string _config_path = "config.json";
 
         private List<string> _errors_include;
         private List<string> _errors_compile;
@@ -121,6 +125,34 @@ namespace GreyHackCompiler
             }
             _value_active.Push(false);
             _map_active.Push(false);
+        }
+
+        public void Save()
+        {
+            Dictionary<string, object> save = new Dictionary<string, object>();
+
+            //adding to save
+            save[nameof(_path_to_classes)] = _path_to_classes;
+
+
+            //writing to file
+            string json = JsonConvert.SerializeObject(save);
+            File.WriteAllText(_config_path,json);
+        }
+        public void Load()
+        {
+            if (!File.Exists(_config_path))
+            {
+                Save();
+                return;
+            }
+
+            Dictionary<string, object> save =
+                JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(_config_path));
+
+
+            _path_to_classes = (string)save[nameof(_path_to_classes)];
+
         }
 
         public string Next()
@@ -336,19 +368,21 @@ namespace GreyHackCompiler
                 }
 
                 AfterLength = sb.Length;
-            }
 
-            if (first && _errors_include.Count!=0)
-            {
-                StringBuilder error_sb = new StringBuilder();
-                foreach (string s in _errors_include)
+                if (_errors_include.Count != 0)
                 {
-                    error_sb.AppendLine(s);
-                }
+                    StringBuilder error_sb = new StringBuilder();
+                    foreach (string s in _errors_include)
+                    {
+                        error_sb.AppendLine(s);
+                    }
 
-                MessageBox.Show(error_sb.ToString(),
-                    $"{_errors_include.Count} " + (_errors_include.Count == 1 ? "Error" : "Errors"));
+                    MessageBox.Show(error_sb.ToString(),
+                        _errors_include.Count + (_errors_include.Count == 1 ? "Error" : "Errors"));
+                }
             }
+
+            
             return sb.ToString();
         }
 

@@ -20,6 +20,8 @@ namespace GreyHackCompiler
             InitializeComponent();
 
             Center();
+
+            compiler.Load();
         }
 
         public void Center()
@@ -124,6 +126,29 @@ namespace GreyHackCompiler
             {
                 MessageBox.Show(exception.Message);
             }
+        }
+
+        private void _btnSelectLocalClassesFolder_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                fbd.Description = "Select folder with your custom classes";
+                if (!string.IsNullOrEmpty(compiler.PathToLocalClasses))
+                {
+                    fbd.SelectedPath = compiler.PathToLocalClasses;
+                }
+                var r = fbd.ShowDialog();
+                if (r == DialogResult.OK)
+                {
+                    compiler.PathToLocalClasses = fbd.SelectedPath;
+                }
+            }
+            
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            compiler.Save();
         }
     }
 }

@@ -37,6 +37,7 @@
             this.rationLabel = new System.Windows.Forms.Label();
             this.swapButton = new System.Windows.Forms.Button();
             this.includeButton = new System.Windows.Forms.Button();
+            this._btnSelectLocalClassesFolder = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // outputRichTextBox
@@ -131,14 +132,24 @@
             // 
             // includeButton
             // 
-            this.includeButton.Location = new System.Drawing.Point(389, 145);
+            this.includeButton.Location = new System.Drawing.Point(388, 186);
             this.includeButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.includeButton.Name = "includeButton";
-            this.includeButton.Size = new System.Drawing.Size(109, 52);
+            this.includeButton.Size = new System.Drawing.Size(109, 48);
             this.includeButton.TabIndex = 8;
             this.includeButton.Text = "Include";
             this.includeButton.UseVisualStyleBackColor = true;
             this.includeButton.Click += new System.EventHandler(this.includeButton_Click);
+            // 
+            // _btnSelectLocalClassesFolder
+            // 
+            this._btnSelectLocalClassesFolder.Location = new System.Drawing.Point(388, 100);
+            this._btnSelectLocalClassesFolder.Name = "_btnSelectLocalClassesFolder";
+            this._btnSelectLocalClassesFolder.Size = new System.Drawing.Size(109, 43);
+            this._btnSelectLocalClassesFolder.TabIndex = 9;
+            this._btnSelectLocalClassesFolder.Text = "Change local directory for classes";
+            this._btnSelectLocalClassesFolder.UseVisualStyleBackColor = true;
+            this._btnSelectLocalClassesFolder.Click += new System.EventHandler(this._btnSelectLocalClassesFolder_Click);
             // 
             // Form1
             // 
@@ -146,6 +157,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(886, 344);
+            this.Controls.Add(this._btnSelectLocalClassesFolder);
             this.Controls.Add(this.includeButton);
             this.Controls.Add(this.swapButton);
             this.Controls.Add(this.rationLabel);
@@ -161,6 +173,7 @@
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "GreyHack Optimizer by Ginger";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.ResumeLayout(false);
@@ -179,6 +192,7 @@
         private System.Windows.Forms.RichTextBox inputRichTextBox;
         private System.Windows.Forms.Button swapButton;
         private System.Windows.Forms.Button includeButton;
+        private System.Windows.Forms.Button _btnSelectLocalClassesFolder;
     }
 }
 
