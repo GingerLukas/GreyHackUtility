@@ -151,7 +151,11 @@ namespace GreyHackCompiler
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(_config_path));
 
 
-            _path_to_classes = (string)save[nameof(_path_to_classes)];
+            var s = (string)save[nameof(_path_to_classes)];
+            if (File.Exists(s))
+            {
+                _path_to_classes = s;
+            }
 
         }
 
