@@ -469,33 +469,31 @@ namespace GreyHackCompiler
                             if (_value_active.Peek())
                             {
                                 RemoveWhiteSpaces();
-                                if (_out_list.Last()[0] != '+' || _out_list.Last()[0]!='*')
+                                
+                                if (_tmp_value.Last() == '"')
                                 {
-                                    if (_tmp_value.Last() == '"')
-                                    {
-                                        _tmp_value.RemoveAt(_tmp_value.Count - 1);
-                                    }
-                                    if (_tmp_value.Count > 0 && _tmp_value[0] == '"')
-                                    {
-                                        _tmp_value.RemoveAt(0);
-                                    }
+                                    _tmp_value.RemoveAt(_tmp_value.Count - 1);
+                                }
+                                if (_tmp_value.Count > 0 && _tmp_value[0] == '"')
+                                {
+                                    _tmp_value.RemoveAt(0);
+                                }
 
-                                    _tmp_value_string = new string(_tmp_value.ToArray());
-                                    if (_keywords.Contains(_tmp_value_string))
-                                    {
-                                        _tmp_value_string = "\"" + _tmp_value_string + "\"";
-                                        break;
-                                    }
-                                    if (!_pairs.ContainsKey(_tmp_value_string))
-                                    {
-                                        _pairs.Add(_tmp_value_string, Next());
-                                    }
-                                    _tmp_value_string = "\"" + _pairs[_tmp_value_string] + "\"";
-                                    
-
-                                    
+                                _tmp_value_string = new string(_tmp_value.ToArray());
+                                if (_keywords.Contains(_tmp_value_string))
+                                {
+                                    _tmp_value_string = "\"" + _tmp_value_string + "\"";
                                     break;
                                 }
+
+                                if (!_pairs.ContainsKey(_tmp_value_string))
+                                {
+                                    _pairs.Add(_tmp_value_string, Next());
+                                }
+
+                                _tmp_value_string = "\"" + _pairs[_tmp_value_string] + "\"";
+                                break;
+                                
                             }
                             _tmp_value_string = new string(_tmp_value.ToArray());
 
