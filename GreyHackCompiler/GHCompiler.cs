@@ -448,7 +448,7 @@ namespace GreyHackCompiler
                             _tmp_value_string = " ";
                             break;
                         case '(':
-                            _value_active.Push(_value_active.Peek());
+                            _value_active.Push(false);
                             _tmp_value_string = "(";
                             break;
                         case ')':
@@ -469,7 +469,7 @@ namespace GreyHackCompiler
                             if (_value_active.Peek())
                             {
                                 RemoveWhiteSpaces();
-                                if (!_operators.Contains(_queue.Peek()) && !_operators.Contains(_out_list.Last()[0]))
+                                if (_out_list.Last()[0] != '+' || _out_list.Last()[0]!='*')
                                 {
                                     if (_tmp_value.Last() == '"')
                                     {
@@ -481,12 +481,19 @@ namespace GreyHackCompiler
                                     }
 
                                     _tmp_value_string = new string(_tmp_value.ToArray());
+                                    if (_keywords.Contains(_tmp_value_string))
+                                    {
+                                        _tmp_value_string = "\"" + _tmp_value_string + "\"";
+                                        break;
+                                    }
                                     if (!_pairs.ContainsKey(_tmp_value_string))
                                     {
                                         _pairs.Add(_tmp_value_string, Next());
                                     }
-
                                     _tmp_value_string = "\"" + _pairs[_tmp_value_string] + "\"";
+                                    
+
+                                    
                                     break;
                                 }
                             }
