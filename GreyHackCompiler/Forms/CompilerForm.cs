@@ -11,11 +11,11 @@ using System.Windows.Forms;
 
 namespace GreyHackCompiler
 {
-    public partial class Form1 : Form
+    public partial class CompilerForm : Form
     {
         GHCompiler compiler = new GHCompiler();
         private string time_label_preset = "Last optimize time:";
-        public Form1()
+        public CompilerForm()
         {
             InitializeComponent();
 

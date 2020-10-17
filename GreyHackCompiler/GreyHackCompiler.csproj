@@ -49,19 +49,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="FileSystem\GHFileSystemUser.cs" />
+    <Compile Include="FileSystem\GHFileSystemNode.cs" />
+    <Compile Include="Forms\CompilerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\CompilerForm.Designer.cs">
+      <DependentUpon>CompilerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GHCompiler.cs" />
-    <Compile Include="GHFileSystem.cs" />
-    <Compile Include="GHTextConvertor.cs" />
+    <Compile Include="Forms\FileSystemViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FileSystemViewerForm.Designer.cs">
+      <DependentUpon>FileSystemViewerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Compiler\GHCompiler.cs" />
+    <Compile Include="Helpers\GHExtension.cs" />
+    <Compile Include="FileSystem\GHFileSystem.cs" />
+    <Compile Include="Helpers\GHTextConvertor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\CompilerForm.resx">
+      <DependentUpon>CompilerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FileSystemViewerForm.resx">
+      <DependentUpon>FileSystemViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -86,5 +98,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace GreyHackCompiler
 {
-    partial class Form1
+    partial class CompilerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -170,7 +170,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.MaximizeBox = false;
-            this.Name = "Form1";
+            this.Name = "CompilerForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "GreyHack Optimizer by Ginger";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
