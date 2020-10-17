@@ -1,6 +1,6 @@
 ﻿namespace GreyHackCompiler.Forms
 {
-    partial class FileSystemViewerForm
+    partial class FileSystemUtilityForm
     {
         /// <summary>
         /// Required designer variable.
@@ -107,8 +107,9 @@
             this._lblDescUsers.TabIndex = 7;
             this._lblDescUsers.Text = "Users:";
             // 
-            // FileSystemViewerForm
+            // FileSystemUtilityForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
@@ -120,8 +121,10 @@
             this.Controls.Add(this._lblDescPublicIp);
             this.Controls.Add(this._tvIPs);
             this.Controls.Add(this._tvFileSystem);
-            this.Name = "FileSystemViewerForm";
+            this.Name = "FileSystemUtilityForm";
             this.Text = "FileSystemViewerForm";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileSystemUtilityForm_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileSystemUtilityForm_DragEnter);
             this.ResumeLayout(false);
             this.PerformLayout();
 

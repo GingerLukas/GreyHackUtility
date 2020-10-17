@@ -13,13 +13,13 @@ using GreyHackCompiler.FileSystem;
 
 namespace GreyHackCompiler.Forms
 {
-    public partial class FileSystemViewerForm : Form
+    public partial class FileSystemUtilityForm : Form
     {
-        public FileSystemViewerForm()
+        public FileSystemUtilityForm()
         {
             InitializeComponent();
 
-            LoadAllFileSystems();
+            //LoadAllFileSystems();
             ClearUi();
         }
 
@@ -29,11 +29,9 @@ namespace GreyHackCompiler.Forms
             _lblPublicIp.Text = "";
         }
 
-        private void LoadAllFileSystems()
+        private void LoadAllFileSystems(string path)
         {
             _tvIPs.Nodes.Clear();
-            string path =
-                @"C:\Users\lukas\OneDrive - Střední škola a vyšší odborná škola aplikované kybernetiky s.r.o\Plocha\GreyHack\Anonymous\images\part0.txt";
             var list = GHFileSystem.LoadFromString(File.ReadAllText(path)).OrderByIp().ToList();
             AddFileSystemToTreeView(list);
 
@@ -104,6 +102,26 @@ namespace GreyHackCompiler.Forms
             _tvFileSystem.Nodes.Clear();
             AddToTreeNodeCollection(((GHFileSystemUser) _lbUsers.SelectedItem).HomeFolder,_tvFileSystem.Nodes);
             _tvFileSystem.ExpandAll();
+        }
+
+        private void FileSystemUtilityForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void FileSystemUtilityForm_DragDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                LoadAllFileSystems(((string[])e.Data.GetData(DataFormats.FileDrop))[0]);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
         }
     }
 }

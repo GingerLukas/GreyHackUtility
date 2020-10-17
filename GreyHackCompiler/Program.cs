@@ -19,7 +19,7 @@ namespace GreyHackCompiler
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FileSystemViewerForm());
+            Application.Run(new HubForm());
         }
     }
 }
