@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GreyHackCompiler
+namespace GreyHackUtils.Helpers
 {
-    class GHTextConvertor
+    public class GHTextConvertor
     {
         public static string Utf14ToDoubleUtf7(char c)
         {

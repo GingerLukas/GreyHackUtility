@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using GreyHackCompiler.FileSystem;
+using GreyHackUtils.Helpers;
 
-namespace GreyHackCompiler.FileSystem
+namespace GreyHackUtils.FileSystem
 {
+    [Serializable]
     public class GHFileSystem
     {
         public string PublicIp
@@ -34,17 +33,60 @@ namespace GreyHackCompiler.FileSystem
 
         private string _localIp;
         public GHFileSystemNode RootNode { get; set; }
-
+        public Dictionary<string,string> FilesContents = new Dictionary<string, string>();
 
         public Dictionary<string,GHFileSystemUser> Users = new Dictionary<string, GHFileSystemUser>();
 
+        public static GHFileSystem LoadFromCompressedString(string publicIp,string localIp,Queue<char> imageQueue,StringBuilder sb)
+        {
+            GHFileSystem fileSystem = new GHFileSystem(){PublicIp = publicIp,LocalIp = localIp};
+            GHFileSystemNode activeNode = null;
+            while (imageQueue.Count > 0)
+            {
+                sb.Clear();
+                while (imageQueue.Peek() < 32768)
+                {
+                    sb.Append(GHTextConvertor.Utf14ToDoubleUtf7(imageQueue.Dequeue()));
+                }
+
+                if (imageQueue.Peek() == (char)Depth.Up)
+                {
+                    activeNode = activeNode.Parent;
+                    imageQueue.Dequeue();
+                    continue;
+                }
+
+                var tmp = new GHFileSystemNode(activeNode, sb.ToString()){FileSystem = fileSystem};
+                tmp.FileFlags = (FileFlag)imageQueue.Dequeue() - 32768;
+                if (activeNode != null)
+                {
+                    activeNode.AddChild(tmp);
+                    if (activeNode.IsHomeFolder && !fileSystem.Users.ContainsKey(tmp.Name))
+                    {
+                        fileSystem.Users.Add(tmp.Name, new GHFileSystemUser() { FileSystem = fileSystem, HomeFolder = tmp });
+                    }
+                    else if (tmp.IsRootUserFolder)
+                    {
+                        fileSystem.Users.Add(tmp.Name, new GHFileSystemUser() { FileSystem = fileSystem, HomeFolder = tmp });
+                    }
+                }
+
+                if (imageQueue.Peek() == (char)Depth.Down)
+                {
+                    imageQueue.Dequeue();
+                    activeNode = tmp;
+                }
+            }
+
+            fileSystem.RootNode = activeNode;
+            return fileSystem;
+        }
         public static List<GHFileSystem> LoadFromString(string input)
         {
             List<GHFileSystem> output = new List<GHFileSystem>();
             Queue<char> queue = new Queue<char>(input);
             while (queue.Count>0)
             {
-                GHFileSystem fileSystem = new GHFileSystem();
                 StringBuilder sb = new StringBuilder();
                 while (queue.Peek() != ';')
                 {
@@ -52,7 +94,7 @@ namespace GreyHackCompiler.FileSystem
                 }
 
                 queue.Dequeue();
-                fileSystem.PublicIp = sb.ToString();
+                string publicIp = sb.ToString();
 
                 sb.Clear();
                 while (queue.Peek() != ';')
@@ -61,52 +103,11 @@ namespace GreyHackCompiler.FileSystem
                 }
 
                 queue.Dequeue();
-                fileSystem.LocalIp = sb.ToString();
-
+                string localIp = sb.ToString();
                 sb.Clear();
-
-                GHFileSystemNode activeNode = null;
-
                 Queue<char> imageQueue = GHTextConvertor.HexToUtf16(queue);
-                while (imageQueue.Count > 0)
-                {
-                    sb.Clear();
-                    while (imageQueue.Peek() < 32768)
-                    {
-                        sb.Append(GHTextConvertor.Utf14ToDoubleUtf7(imageQueue.Dequeue()));
-                    }
-
-                    if (imageQueue.Peek() == (char) Depth.Up)
-                    {
-                        activeNode = activeNode.Parent;
-                        imageQueue.Dequeue();
-                        continue;
-                    }
-
-                    var tmp = new GHFileSystemNode(activeNode, sb.ToString());
-                    tmp.FileFlags = (FileFlag) imageQueue.Dequeue() - 32768;
-                    if (activeNode!=null)
-                    {
-                        activeNode.AddChild(tmp);
-                        if (activeNode.IsHomeFolder && !fileSystem.Users.ContainsKey(tmp.Name))
-                        {
-                            fileSystem.Users.Add(tmp.Name,new GHFileSystemUser(){FileSystem = fileSystem,HomeFolder = tmp});
-                        }
-                        else if (tmp.IsRootUserFolder)
-                        {
-                            fileSystem.Users.Add(tmp.Name,new GHFileSystemUser(){FileSystem = fileSystem,HomeFolder = tmp});
-                        }
-                    }
-
-                    if (imageQueue.Peek() == (char) Depth.Down)
-                    {
-                        imageQueue.Dequeue();
-                        activeNode = tmp;
-                    }
-                }
-
-                fileSystem.RootNode = activeNode;
-                output.Add(fileSystem);
+                
+                output.Add(LoadFromCompressedString(publicIp,localIp,imageQueue,sb));
                 queue.Dequeue();
             }
 
@@ -129,6 +130,11 @@ namespace GreyHackCompiler.FileSystem
             }
 
         }
+
+        public bool IsServer => RootNode.Children.ContainsKey("server");
+
+        public bool IsRouter => IpAsArray[7] == 1;
+        
 
         public override string ToString()
         {

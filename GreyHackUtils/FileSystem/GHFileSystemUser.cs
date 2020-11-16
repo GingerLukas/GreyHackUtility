@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GreyHackCompiler.FileSystem
+namespace GreyHackUtils.FileSystem
 {
+    [Serializable]
     public class GHFileSystemUser
     {
         public GHFileSystemNode HomeFolder { get; set; }

@@ -1,14 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
-namespace GreyHackCompiler.FileSystem
+namespace GreyHackUtils.FileSystem
 {
+    [Serializable]
     public class GHFileSystemNode
     {
+        public GHFileSystem FileSystem { get; set; }
         public FileFlag FileFlags { get; set; }
         public string Name { get; set; }
         public long Size { get; set; }
-        public string Content { get; set; }
+
+        public string Content
+        {
+            get
+            {
+                if (FileSystem.FilesContents.ContainsKey(Path))
+                    return FileSystem.FilesContents[Path];
+                return null;
+            }
+        }
+
+        public string Path
+        {
+            get
+            {
+                List<string> list = new List<string>();
+                GHFileSystemNode node = this;
+                do
+                {
+                    list.Add(node.Name);
+                    node = node.Parent;
+                } while (node!=node.Parent);
+                list.Add("");
+                list.Reverse();
+
+                return string.Join("/", list.ToArray());
+            }
+        }
 
         public bool IsHomeFolder => Name == "home" && Parent.IsRootFolder;
 
@@ -93,7 +123,8 @@ namespace GreyHackCompiler.FileSystem
 
         public void AddChild(GHFileSystemNode node)
         {
-            Children.Add(node.Name,node);
+            if (!Children.ContainsKey(node.Name))
+                Children.Add(node.Name,node);
         }
 
         private string ToString(int depth)

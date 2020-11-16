@@ -44,6 +44,7 @@
             this._tvFileSystem.Name = "_tvFileSystem";
             this._tvFileSystem.Size = new System.Drawing.Size(280, 428);
             this._tvFileSystem.TabIndex = 0;
+            this._tvFileSystem.DoubleClick += new System.EventHandler(this._tvFileSystem_DoubleClick);
             // 
             // _tvIPs
             // 

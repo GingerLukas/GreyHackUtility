@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,10 +32,20 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GingerGHClient">
+      <HintPath>E:\Program Files\Steam\steamapps\common\Grey Hack\Grey Hack_Data\Managed\GingerGHClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Reflection, Version=1.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.Core.1.1.1\lib\net45\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Pose, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Pose.1.2.1\lib\netstandard2.0\Pose.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,8 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileSystem\GHFileSystemUser.cs" />
-    <Compile Include="FileSystem\GHFileSystemNode.cs" />
     <Compile Include="Forms\CompilerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,15 +73,18 @@
       <DependentUpon>FileSystemViewerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Compiler\GHCompiler.cs" />
+    <Compile Include="Forms\FileViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FileViewerForm.Designer.cs">
+      <DependentUpon>FileViewerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\HubForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\HubForm.Designer.cs">
       <DependentUpon>HubForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\GHExtension.cs" />
-    <Compile Include="FileSystem\GHFileSystem.cs" />
-    <Compile Include="Helpers\GHTextConvertor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\CompilerForm.resx">
@@ -80,6 +92,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FileSystemViewerForm.resx">
       <DependentUpon>FileSystemViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FileViewerForm.resx">
+      <DependentUpon>FileViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\HubForm.resx">
       <DependentUpon>HubForm.cs</DependentUpon>
@@ -107,6 +122,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\GreyHackUtils\GreyHackUtils.csproj">
+      <Project>{3cc033ce-de50-461f-8186-5d0b8a7bf2af}</Project>
+      <Name>GreyHackUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

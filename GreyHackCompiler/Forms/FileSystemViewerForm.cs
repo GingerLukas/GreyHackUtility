@@ -6,10 +6,13 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GreyHackCompiler.FileSystem;
+using GingerGHClient;
+using GreyHackUtils.FileSystem;
+using GreyHackUtils.Helpers;
 
 namespace GreyHackCompiler.Forms
 {
@@ -32,10 +35,26 @@ namespace GreyHackCompiler.Forms
         private void LoadAllFileSystems(string path)
         {
             _tvIPs.Nodes.Clear();
-            var list = GHFileSystem.LoadFromString(File.ReadAllText(path)).OrderByIp().ToList();
-            AddFileSystemToTreeView(list);
+            var info = new FileInfo(path);
+            if (info.Extension==".ghmod")
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                using (FileStream fs = File.Open(path,FileMode.Open))
+                {
+                    GingerSave save = (GingerSave) bf.Deserialize(fs);
+                    fileSystems = save.IpPairToFileSystem.Values.Select(x => x).ToList();
+                    fs.Close();
+                }   
+            }
+            else
+            {
+                fileSystems = GHFileSystem.LoadFromString(File.ReadAllText(path)).OrderByIp().ToList();
+            }
+            AddFileSystemToTreeView(fileSystems);
 
         }
+
+        List<GHFileSystem> fileSystems = new List<GHFileSystem>();
 
         private void AddFileSystemToTreeView(List<GHFileSystem> fileSystems)
         {
@@ -47,22 +66,36 @@ namespace GreyHackCompiler.Forms
                 }
 
                 _tvIPs.Nodes[fileSystem.PublicIp].Nodes.Add(fileSystem.LocalIp, fileSystem.LocalIp);
-                _tvIPs.Nodes[fileSystem.PublicIp].Nodes[fileSystem.LocalIp].Tag = fileSystem;
+                var publicNode = _tvIPs.Nodes[fileSystem.PublicIp];
+                var node = publicNode.Nodes[fileSystem.LocalIp];
+                node.Tag = fileSystem;
+                if (fileSystem.IsRouter)
+                {
+                    node.ForeColor = Color.White;
+                    node.BackColor = Color.Black;
+                }
+                else if (fileSystem.IsServer)
+                {
+                    node.ForeColor = Color.Yellow;
+                    node.BackColor = Color.Red;
+                }
+                else
+                {
+                    node.ForeColor = Color.White;
+                    node.BackColor = Color.Blue;
+                }
                 _fileSystems[fileSystem.ToString()] = fileSystem;
+
+
+
             }
+
+            _tvIPs.ExpandAll();
+            _tvIPs.SelectedNode = _tvIPs.Nodes[0];
         }
 
         private Dictionary<string,GHFileSystem> _fileSystems = new Dictionary<string, GHFileSystem>();
 
-        private void AddToTreeNodeCollection(GHFileSystemNode node, TreeNodeCollection treeNodeCollection)
-        {
-            treeNodeCollection.Add(node.Name);
-            treeNodeCollection = treeNodeCollection[treeNodeCollection.Count - 1].Nodes;
-            foreach (var child in node.Children)
-            {
-                AddToTreeNodeCollection(child.Value,treeNodeCollection);
-            }
-        }
 
         public void LoadFileSystem(GHFileSystem fileSystem)
         {
@@ -73,7 +106,7 @@ namespace GreyHackCompiler.Forms
             _lblLocalIp.Text = fileSystem.LocalIp;
 
 
-            AddToTreeNodeCollection(fileSystem.RootNode,_tvFileSystem.Nodes);
+            fileSystem.RootNode.AddToTreeNodeCollection(_tvFileSystem.Nodes);
             _tvFileSystem.ExpandAll();
             _tvFileSystem.SelectedNode = _tvFileSystem.Nodes[0];
 
@@ -100,7 +133,7 @@ namespace GreyHackCompiler.Forms
             }
 
             _tvFileSystem.Nodes.Clear();
-            AddToTreeNodeCollection(((GHFileSystemUser) _lbUsers.SelectedItem).HomeFolder,_tvFileSystem.Nodes);
+            ((GHFileSystemUser)_lbUsers.SelectedItem).HomeFolder.AddToTreeNodeCollection(_tvFileSystem.Nodes);
             _tvFileSystem.ExpandAll();
         }
 
@@ -121,6 +154,15 @@ namespace GreyHackCompiler.Forms
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void _tvFileSystem_DoubleClick(object sender, EventArgs e)
+        {
+            GHFileSystemNode node = _tvFileSystem.SelectedNode.Tag as GHFileSystemNode;
+            if (node!=null)
+            {
+                new FileViewerForm(node.Content).Show();
             }
         }
     }
