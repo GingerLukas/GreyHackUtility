@@ -259,11 +259,12 @@ namespace GreyHackCompiler
             return true;
         }
 
-        public string GetClassFromGitHub(string author, string name)
+        public string GetClassFromGitHub(string path)
         {
             try
             {
-                string url = $"https://raw.githack.com/{author}/GreyHackClasses/main/{name}.src";
+                string raw_url = @"https://raw.githubusercontent.com";
+                string url = $"{raw_url}/{path}";
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -284,7 +285,7 @@ namespace GreyHackCompiler
             }
             catch (Exception e)
             {
-                _errors_include.Add($"ERROR::GITHUB_CLASS_NOT_FOUND({name} by {author})");
+                _errors_include.Add($"ERROR::GITHUB_CLASS_NOT_FOUND({path})");
                 return "";
             }
             
@@ -293,7 +294,7 @@ namespace GreyHackCompiler
 
         public string GetClassFromFile(string name)
         {
-            string path = Path.Combine(_path_to_classes, name)+".src";
+            string path = Path.Combine(_path_to_classes, name);
             if (!File.Exists(path))
             {
                 _errors_include.Add($"ERROR::LOCAL_CLASS_NOT_FOUND({name})");
@@ -305,19 +306,12 @@ namespace GreyHackCompiler
 
         public string GetClass(string name)
         {
-            var tmp = name.Split('/');
-            if (tmp.Length>2)
+            if (name.Length>3&&name.Substring(0,3)=="git")
             {
-                _errors_include.Add($"ERROR::INVALID_CLASS_NAME({name})");
-                return "";
+                return GetClassFromGitHub(name.Substring(4));
             }
 
-            if (tmp.Length==2)
-            {
-                return GetClassFromGitHub(tmp[0], tmp[1]);
-            }
-
-            return GetClassFromFile(tmp[0]);
+            return GetClassFromFile(name);
         }
 
         public string Include(string input, string start = "#!", string end = "!", bool first = true, bool start_sw = true)
