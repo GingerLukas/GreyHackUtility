@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GreyHackCompiler.Forms;
-using GingerGHClient;
 using GreyHackUtils.FileSystem;
 using GreyHackUtils.Helpers;
 using Pose;

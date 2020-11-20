@@ -10,7 +10,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GingerGHClient;
 using GreyHackUtils.FileSystem;
 using GreyHackUtils.Helpers;
 

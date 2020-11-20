@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using GingerGHClient;
+using GreyHackUtils.FileSystem;
 
 namespace GreyHackUtils.Helpers
 {
@@ -63,6 +64,54 @@ namespace GreyHackUtils.Helpers
             }
 
             return save;
+        }
+    }
+    [Serializable]
+    public class GingerSave
+    {
+        public Dictionary<string, HashSet<string>> NetIdToPlayersIps { get; set; }
+
+        public Dictionary<string, string> NetIdToIp { get; set; }
+
+        public Dictionary<string, string> IpToNetId { get; set; }
+
+        public Dictionary<string, string> UrlToNetId { get; set; }
+
+        public Dictionary<string, GHFileSystem> IpPairToFileSystem { get; set; }
+
+        public HashSet<string> PlayerNetIds { get; set; }
+
+        public HashSet<string> PlayerIPs { get; set; }
+
+        public HashSet<string> NetIds { get; set; }
+
+        public HashSet<string> Urls { get; set; }
+
+        public HashSet<string> ShopUrls { get; set; }
+
+        public HashSet<string> BankUrls { get; set; }
+
+        public HashSet<string> MailUrls { get; set; }
+
+        public Dictionary<string, string> RentedServers { get; set; }
+
+        public Dictionary<string, string> WifiToNetId { get; set; }
+
+        public GingerSave()
+        {
+            this.NetIdToPlayersIps = new Dictionary<string, HashSet<string>>();
+            this.NetIdToIp = new Dictionary<string, string>();
+            this.IpToNetId = new Dictionary<string, string>();
+            this.UrlToNetId = new Dictionary<string, string>();
+            this.IpPairToFileSystem = new Dictionary<string, GHFileSystem>();
+            this.PlayerNetIds = new HashSet<string>();
+            this.PlayerIPs = new HashSet<string>();
+            this.NetIds = new HashSet<string>();
+            this.Urls = new HashSet<string>();
+            this.ShopUrls = new HashSet<string>();
+            this.BankUrls = new HashSet<string>();
+            this.MailUrls = new HashSet<string>();
+            this.WifiToNetId = new Dictionary<string, string>();
         }
     }
 }
