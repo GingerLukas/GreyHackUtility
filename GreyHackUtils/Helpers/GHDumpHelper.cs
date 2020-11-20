@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using GreyHackUtils.FileSystem;
 
@@ -52,7 +51,7 @@ namespace GreyHackUtils.Helpers
                 sb.Append(" -f @@ ");
             }
             return sb.ToString();
-        }
+        }/*
 
         public static GingerSave LoadSave(string path)
         {
@@ -64,7 +63,7 @@ namespace GreyHackUtils.Helpers
             }
 
             return save;
-        }
+        }*/
     }
     [Serializable]
     public class GingerSave
