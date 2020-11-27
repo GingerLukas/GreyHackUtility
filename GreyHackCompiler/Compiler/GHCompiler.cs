@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using GreyHackUtils.Helpers;
 using Newtonsoft.Json;
 
 namespace GreyHackCompiler
@@ -91,6 +92,8 @@ namespace GreyHackCompiler
             Setup();
         }
 
+        #region Internal
+
         private void Setup()
         {
             //keywords init
@@ -137,8 +140,9 @@ namespace GreyHackCompiler
 
             //writing to file
             string json = JsonConvert.SerializeObject(save);
-            File.WriteAllText(_config_path,json);
+            File.WriteAllText(_config_path, json);
         }
+        
         public void Load()
         {
             if (!File.Exists(_config_path))
@@ -242,22 +246,10 @@ namespace GreyHackCompiler
 
         }
 
-        private bool CompareStrings(ref string one, int start, string two)
-        {
-            if (one.Length - start < two.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < two.Length; i++, start++)
-            {
-                if (one[start] != two[i])
-                {
-                    return false;
-                }
-            }
 
-            return true;
-        }
+        #endregion
+
+        #region Include
 
         public string GetClassFromGitHub(string path)
         {
@@ -288,7 +280,7 @@ namespace GreyHackCompiler
                 _errors_include.Add($"ERROR::GITHUB_CLASS_NOT_FOUND({path})");
                 return "";
             }
-            
+
 
         }
 
@@ -306,7 +298,7 @@ namespace GreyHackCompiler
 
         public string GetClass(string name)
         {
-            if (name.Length>3&&name.Substring(0,3)=="git")
+            if (name.Length > 3 && name.Substring(0, 3) == "git")
             {
                 return GetClassFromGitHub(name.Substring(4));
             }
@@ -329,11 +321,11 @@ namespace GreyHackCompiler
             int index = 0;
             while (index < input.Length)
             {
-                if (CompareStrings(ref input, index, start))
+                if (Helper.CompareStrings(input, index, start))
                 {
                     class_sb.Clear();
                     index += start.Length;
-                    while (!CompareStrings(ref input, index, end))
+                    while (!Helper.CompareStrings(input, index, end))
                     {
                         class_sb.Append(input[index]);
                         index++;
@@ -341,12 +333,12 @@ namespace GreyHackCompiler
 
                     index += end.Length;
                     string class_tmp = class_sb.ToString();
-                    
+
 
                     if (!_included.Contains(class_tmp))
                     {
                         _included.Add(class_tmp);
-                        
+
                         sb.Append(Include(GetClass(class_tmp), start, end, false, start_sw));
                     }
                 }
@@ -380,8 +372,28 @@ namespace GreyHackCompiler
                 }
             }
 
-            
+
             return sb.ToString();
+        }
+
+        #endregion
+
+
+
+        public string Compile(string input)
+        {
+            ResetCompiler();
+            _queue = new Queue<char>(input);
+
+
+
+
+
+            _tmp_out = string.Join("", _out_list);
+            sw.Stop();
+            LastTimeTicks = sw.ElapsedTicks;
+            AfterLength = _tmp_out.Length;
+            return _tmp_out;
         }
 
         public string Optimize(string input, string start = "#!", string end = "!")

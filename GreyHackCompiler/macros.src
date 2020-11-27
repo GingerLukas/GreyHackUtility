@@ -1,0 +1,25 @@
+a++
+(a = a + 1)
+
+a += b
+(a = a + b)
+
+a << b
+(a = bitwise("<<",a,b))
+
+a >> b
+(a = bitwise(">>",a,b))
+
+a >>> b
+(a = bitwise(">>>",a,b))
+
+a | b
+(a = bitwise("|",a,b))
+
+a & b
+(a = bitwise("&",a,b))
+
+a ^ b
+(a = bitwise("^",a,b))
+
+

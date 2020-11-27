@@ -52,6 +52,7 @@
     <Compile Include="Helpers\GHDumpHelper.cs" />
     <Compile Include="Helpers\GHExtension.cs" />
     <Compile Include="Helpers\GHTextConvertor.cs" />
+    <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Helpers\IPHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
